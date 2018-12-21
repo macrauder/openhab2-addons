@@ -209,7 +209,6 @@ public class SensorThingHandler extends BaseThingHandler implements ValueUpdateL
         Integer buttonevent = state.buttonevent;
         Integer status = state.status;
         Boolean presence = state.presence;
-        Boolean open = state.open;
         Integer power = state.power;
         Integer lux = state.lux;
         Float temperature = state.temperature;
@@ -244,7 +243,7 @@ public class SensorThingHandler extends BaseThingHandler implements ValueUpdateL
                 break;
             case BindingConstants.CHANNEL_TEMPERATURE:
                 if (temperature != null) {
-                    updateState(channelID, new QuantityType<Temperature>(temperature / 100, SIUnits.CELSIUS));
+                    updateState(channelID, new QuantityType<Temperature>(temperature, SIUnits.CELSIUS));
                 }
                 break;
             case BindingConstants.CHANNEL_PRESENCE:
@@ -255,11 +254,6 @@ public class SensorThingHandler extends BaseThingHandler implements ValueUpdateL
             case BindingConstants.CHANNEL_VALUE:
                 if (status != null) {
                     updateState(channelID, new DecimalType(status));
-                }
-                break;
-            case BindingConstants.CHANNEL_OPENCLOSE:
-                if (open != null) {
-                    updateState(channelID, OnOffType.from(open));
                 }
                 break;
         }
