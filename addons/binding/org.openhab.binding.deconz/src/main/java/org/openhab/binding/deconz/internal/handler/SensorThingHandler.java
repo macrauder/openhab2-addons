@@ -10,6 +10,7 @@ package org.openhab.binding.deconz.internal.handler;
 
 import java.util.Map;
 
+import javax.measure.quantity.Dimensionless;
 import javax.measure.quantity.Energy;
 import javax.measure.quantity.Illuminance;
 import javax.measure.quantity.Temperature;
@@ -19,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
+import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.library.types.QuantityType;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.library.unit.SIUnits;
@@ -209,9 +211,11 @@ public class SensorThingHandler extends BaseThingHandler implements ValueUpdateL
         Integer buttonevent = state.buttonevent;
         Integer status = state.status;
         Boolean presence = state.presence;
+        Boolean open = state.open;
         Integer power = state.power;
         Integer lux = state.lux;
         Float temperature = state.temperature;
+        Float humidity = state.humidity;
 
         switch (channelID) {
             case BindingConstants.CHANNEL_DAYLIGHT:
@@ -243,7 +247,12 @@ public class SensorThingHandler extends BaseThingHandler implements ValueUpdateL
                 break;
             case BindingConstants.CHANNEL_TEMPERATURE:
                 if (temperature != null) {
-                    updateState(channelID, new QuantityType<Temperature>(temperature, SIUnits.CELSIUS));
+                    updateState(channelID, new QuantityType<Temperature>(temperature / 100, SIUnits.CELSIUS));
+                }
+                break;
+            case BindingConstants.CHANNEL_HUMIDITY:
+                if (humidity != null) {
+                    updateState(channelID, new QuantityType<Dimensionless>(humidity / 100, SmartHomeUnits.PERCENT));
                 }
                 break;
             case BindingConstants.CHANNEL_PRESENCE:
@@ -256,10 +265,21 @@ public class SensorThingHandler extends BaseThingHandler implements ValueUpdateL
                     updateState(channelID, new DecimalType(status));
                 }
                 break;
-        }
-
-        if (buttonevent != null) {
-            triggerChannel(BindingConstants.CHANNEL_BUTTONEVENT, String.valueOf(buttonevent));
+            case BindingConstants.CHANNEL_OPENCLOSE:
+                if (open != null) {
+                    updateState(channelID, open ? OpenClosedType.OPEN : OpenClosedType.CLOSED);
+                }
+                break;
+            case BindingConstants.CHANNEL_BUTTON:
+                if (buttonevent != null) {
+                    updateState(channelID, new DecimalType(buttonevent));
+                }
+                break;
+            case BindingConstants.CHANNEL_BUTTONEVENT:
+                if (buttonevent != null) {
+                    triggerChannel(BindingConstants.CHANNEL_BUTTONEVENT, String.valueOf(buttonevent));
+                }
+                break;
         }
     }
 
